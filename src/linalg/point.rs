@@ -25,11 +25,11 @@ impl Point {
     }
     /// Compute the squared distance between this point and another
     pub fn distance_sqr(&self, a: &Point) -> f32 {
-        (self - a).length_sqr()
+        (*self - *a).length_sqr()
     }
     /// Compute the distance between this point and another
     pub fn distance(&self, a: &Point) -> f32 {
-        (self - a).length()
+        (*self - *a).length()
     }
 }
 
@@ -169,3 +169,15 @@ fn test_distance_sqr() {
     assert!(b.distance_sqr(&a) == 25f32);
 }
 
+#[test]
+fn subtract_points() {
+    let mut v = Vector::new(-2f32, -4f32, -6f32);
+
+    let p1 = Point::new(3f32, 2f32, 1f32);
+    let p2 = Point::new(5f32, 6f32, 7f32);
+
+    // println!("p1: {:?}", p1);
+    println!("p1: {:?}", p1-p2);
+
+    assert!(p1-p2 == v);
+}

@@ -149,19 +149,8 @@ fn test_index() {
     let mut v = Vector::new(1f32, 2f32, 3f32);
     assert!(v[0] == 1f32 && v[1] == 2f32 && v[2] == 3f32);
 
-    x = &mut v[1];
+    let x = &mut v[1];
     *x = 5f32;
     assert!(v[1] == 5f32);
-}
-
-
-#[test]
-fn subtract_points() {
-    let mut v = Vector::new(-2f32, -4f32, -6f32);
-
-    let p1 = Point::new(3f32, 2f32, 1f32);
-    let p2 = Point::new(5f32, 5f32, 7f32);
-
-    assert!(p1-p2 == v);
 }
 
