@@ -27,7 +27,7 @@ rust-nightly:
     - cargo test --verbose
   allow_failure: true
 
-image: "rust:nightly"
+image: "rust:latest"
 
 
 stages:          # List of stages for jobs, and their order of execution
