@@ -1,4 +1,6 @@
-use std::ops::{Add, Sub, Mul, Div, Neg, Index, IndexMut};
+use std::ops::{Add, Sub, Mul, Div, Neg, Index, IndexMut, AddAssign, MulAssign, DivAssign};
+use std::ops;
+
 use crate::linalg::point::Point;
 
 /// Vector is a standard 3 component vector
@@ -31,79 +33,118 @@ impl Vector {
         let len = self.length();
         Vector { x: self.x / len, y: self.y / len, z: self.z / len }
     }
-}
+    /// Normalize the vector in place
+    pub fn normalize(&mut self)  {
+        let len = self.length();
+        *self /= len;
+    }
 
-impl Add for Vector {
-    type Output = Vector;
-    /// Add two vectors together
-    fn add(self, rhs: Vector) -> Vector {
-        Vector { x: self.x + rhs.x, y: self.y + rhs.y, z: self.z + rhs.z }
+    pub fn dot(&self, b: &Vector) -> f32 {
+        self.x * b.x +
+        self.y * b.y +
+        self.z * b.z
+    }
+
+    pub fn cross(&self, b: &Vector) -> Vector {
+        Vector::new(
+            self.y * b.z - self.z * b.y,
+            self.z * b.x - self.x * b.z,
+            self.x * b.y - self.y * b.x,
+        )
     }
 }
 
-impl Sub for Vector {
-    type Output = Vector;
-    /// Subtract two vectors
-    fn sub(self, rhs: Vector) -> Vector {
-        Vector { x: self.x - rhs.x, y: self.y - rhs.y, z: self.z - rhs.z }
+// Binary Operators
+impl_op_ex!(+ |a: &Vector, b: &Vector| -> Vector {
+    Vector {
+        x: a.x + b.x,
+        y: a.y + b.y,
+        z: a.z + b.z
     }
-}
+});
 
-impl Mul for Vector {
-    type Output = Vector;
-    /// Multiply two vectors
-    fn mul(self, rhs: Vector) -> Vector {
-        Vector { x: self.x * rhs.x, y: self.y * rhs.y, z: self.z * rhs.z }
+impl_op_ex!(- |a: &Vector, b: &Vector| -> Vector {
+    Vector {
+        x: a.x - b.x,
+        y: a.y - b.y,
+        z: a.z - b.z
     }
-}
+});
 
-impl Mul<f32> for Vector {
-    type Output = Vector;
-    /// Scale the vector by some value
-    fn mul(self, rhs: f32) -> Vector {
-        Vector { x: self.x * rhs, y: self.y * rhs, z: self.z * rhs }
+impl_op_ex_commutative!(* |a: &Vector, scalar: f32 | -> Vector {
+    Vector {
+        x: a.x * scalar,
+        y: a.y * scalar,
+        z: a.z * scalar,
     }
-}
+});
 
-impl Mul<Vector> for f32 {
-    type Output = Vector;
-    /// Scale the vector by some value
-    fn mul(self, rhs: Vector) -> Vector {
-        Vector { x: self * rhs.x, y: self * rhs.y, z: self * rhs.z }
+impl_op_ex!(/ |a: &Vector, scalar: f32| -> Vector {
+    Vector {
+        x: a.x / scalar,
+        y: a.y / scalar,
+        z: a.z / scalar,
     }
-}
+});
 
-impl Mul<Point> for Vector {
-    type Output = Point;
-    /// Scale the vector by some value
-    fn mul(self, rhs: Point) -> Point {
-        Point { x: self.x * rhs.x, y: self.y * rhs.y, z: self.z * rhs.z }
+// Unary operators
+impl_op_ex!(- |a: &Vector| -> Vector {
+    Vector {
+        x: -a.x,
+        y: -a.y,
+        z: -a.z,
     }
-}
+});
 
-impl Div for Vector {
-    type Output = Vector;
-    /// Divide the vectors components by the right hand side's components
-    fn div(self, rhs: Vector) -> Vector {
-        Vector { x: self.x / rhs.x, y: self.y / rhs.y, z: self.z / rhs.z }
-    }
-}
+// Assignment operators
+impl_op_ex!(+= |a: &mut Vector, b: &Vector| {
+    a.x += b.x;
+    a.y += b.y;
+    a.z += b.z;
+});
 
-impl Div<f32> for Vector {
-    type Output = Vector;
-    /// Divide the vectors components by a scalar
-    fn div(self, rhs: f32) -> Vector {
-        Vector { x: self.x / rhs, y: self.y / rhs, z: self.z / rhs }
-    }
-}
+// impl AddAssign<f32> for Vector {
+//     fn add_assign(&mut self, rhs: f32) {
+//         self.x += rhs;
+//         self.y += rhs;
+//         self.z += rhs;
+//     }
+// }
+//
+// impl MulAssign<f32> for Vector {
+//     fn mul_assign(&mut self, rhs: f32) {
+//         self.x *= rhs;
+//         self.y *= rhs;
+//         self.z *= rhs;
+//     }
+// }
+//
+// impl DivAssign<f32> for Vector {
+//     fn div_assign(&mut self, rhs: f32) {
+//         self.x /= rhs;
+//         self.y /= rhs;
+//         self.z /= rhs;
+//     }
+// }
 
-impl Neg for Vector {
-    type Output = Vector;
-    /// Negate the vector
-    fn neg(self) -> Vector {
-        Vector { x: -self.x, y: -self.y, z: -self.z }
-    }
-}
+impl_op_ex!(-= |a: &mut Vector, b: &Vector| {
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
+});
+
+impl_op!(/= |a: &mut Vector, b: f32| {
+    a.x /= b;
+    a.y /= b;
+    a.z /= b;
+});
+
+impl_op_ex!(*= |a: &mut Vector, b: f32| {
+    a.x *= b;
+    a.y *= b;
+    a.z *= b;
+});
+
 
 impl Index<usize> for Vector {
     type Output = f32;
@@ -138,19 +179,10 @@ impl IndexMut<usize> for Vector {
     }
 }
 
-#[test]
-fn test_len_sqr() {
-    let v = Vector::new(1f32, 2f32, 3f32);
-    assert!(v.length_sqr() == 1f32 + 4f32 + 9f32);
+pub fn dot(a: &Vector, b: &Vector) -> f32 {
+    a.dot(b)
 }
 
-#[test]
-fn test_index() {
-    let mut v = Vector::new(1f32, 2f32, 3f32);
-    assert!(v[0] == 1f32 && v[1] == 2f32 && v[2] == 3f32);
-
-    let x = &mut v[1];
-    *x = 5f32;
-    assert!(v[1] == 5f32);
+pub fn cross(a: &Vector, b: &Vector) -> Vector {
+    a.cross(b)
 }
-

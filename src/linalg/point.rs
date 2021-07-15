@@ -130,54 +130,18 @@ impl Index<usize> for Point {
     }
 }
 
-// impl Index<Axis> for Point {
-//     type Output = f32;
-//     /// Access the point by index
-//     ///
-//     /// - 0 = x
-//     /// - 1 = y
-//     /// - 2 = z
-//     fn index(&self, i: Axis) -> &f32 {
-//         match i {
-//             Axis::X => &self.x,
-//             Axis::Y => &self.y,
-//             Axis::Z => &self.z,
-//         }
-//     }
-// }
-//
-// impl IndexMut<usize> for Point {
-//     /// Access the point by index
-//     ///
-//     /// - 0 = x
-//     /// - 1 = y
-//     /// - 2 = z
-//     fn index_mut(&mut self, i: usize) -> &mut f32 {
-//         match i {
-//             0 => &mut self.x,
-//             1 => &mut self.y,
-//             2 => &mut self.z,
-//             _ => panic!("Invalid index into point"),
-//         }
-//     }
-// }
-
-#[test]
-fn test_distance_sqr() {
-    let a = Point::new(0f32, 0f32, 0f32);
-    let b = Point::new(3f32, 4f32, 0f32);
-    assert!(b.distance_sqr(&a) == 25f32);
-}
-
-#[test]
-fn subtract_points() {
-    let mut v = Vector::new(-2f32, -4f32, -6f32);
-
-    let p1 = Point::new(3f32, 2f32, 1f32);
-    let p2 = Point::new(5f32, 6f32, 7f32);
-
-    // println!("p1: {:?}", p1);
-    println!("p1: {:?}", p1-p2);
-
-    assert!(p1-p2 == v);
+impl IndexMut<usize> for Point {
+    /// Access the point by index
+    ///
+    /// - 0 = x
+    /// - 1 = y
+    /// - 2 = z
+    fn index_mut(&mut self, i: usize) -> &mut f32 {
+        match i {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => panic!("Invalid index into point"),
+        }
+    }
 }
